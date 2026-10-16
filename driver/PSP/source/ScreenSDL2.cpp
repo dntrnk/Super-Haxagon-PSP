@@ -16,7 +16,7 @@ namespace SuperHaxagon {
 		~ScreenImpl() = default;
 
 		Vec2f getScreenDim() const {
-			if (!loaded) return {640, 480};
+			if (!loaded) return {480, 272};
 
 			int w, h;
 			SDL_GetRendererOutputSize(renderer, &w, &h);

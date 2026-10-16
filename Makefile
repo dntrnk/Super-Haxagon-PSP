@@ -56,7 +56,7 @@ LIBS = -Wl,--gc-sections -Wl,--start-group -lpspgu -lpspge -lharfbuzz -lpspdispl
 
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = Super Haxagon
-# PSP_EBOOT_ICON = res/ICON0.PNG
+PSP_EBOOT_ICON = media/ICON0.PNG
 # PSP_EBOOT_PIC0 = res/PIC0.PNG
 # PSP_EBOOT_PIC1 = res/PIC1.PNG
 

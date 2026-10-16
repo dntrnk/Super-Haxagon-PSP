@@ -3,85 +3,96 @@
 
 #include "Driver/Music.hpp"
 
-#include <SDL2/SDL_mixer.h>
+#include "pspaalib.h"
 
 #include <chrono>
 #include <string>
 
 namespace SuperHaxagon {
+	static constexpr int AT3_CHANNEL = PSPAALIB_CHANNEL_AT3_1;
+
 	std::chrono::system_clock::time_point getNow() {
-		// Unfortunately the implementation of Mix_GetMusicPosition seems to be...
-		// inaccurate, to say the least. It also forces us to use version 2.6.0.
-		// So instead of relying on the kinda buggy implementation that Mix provides,
-		// keep track of the time ourselves.
-
-		// This does mean that if the application is paused for any reason (say, a debugger)
-		// the current time the music is at will be offset from what it actually is.
-
-		// A good compromise would be to use a mix of both, where if Mix_GetMusicPosition
-		// deviates too far form what we have, update our timestamp with Mix's, but that
-		// would again force us to use a newer version of Mix.
 		return std::chrono::high_resolution_clock::now();
 	}
 
 	struct Music::MusicImpl {
 		MusicImpl(const std::string& path) {
-			music = Mix_LoadMUS(path.c_str());
+			AalibStop(AT3_CHANNEL);
+    		AalibWaitThreadFinished(AT3_CHANNEL);
+			
+    		AalibUnload(AT3_CHANNEL);
+
+			int res = AalibLoad(const_cast<char*>(path.c_str()), AT3_CHANNEL, true);
+			if (res != PSPAALIB_SUCCESS) {
+				loadFailed = true;
+				return;
+			}
+
+			AalibSetAutoloop(AT3_CHANNEL, false);
+			AalibEnable(AT3_CHANNEL, PSPAALIB_EFFECT_VOLUME_MANUAL);
+			AalibSetVolume(AT3_CHANNEL, AalibVolume{1.0f, 1.0f});
 		}
 
 		~MusicImpl() {
-			Mix_HaltMusic();
-			Mix_FreeMusic(music);
+			AalibStop(AT3_CHANNEL);
+			AalibWaitThreadFinished(AT3_CHANNEL);
+			AalibUnload(AT3_CHANNEL);
 		}
 
 		bool isDone() const {
-			// Note that Mix_PlayingMusic does not check if the channel is paused.
-			return !Mix_PlayingMusic();
+			if (loadFailed) return true;
+			return AalibGetStatus(AT3_CHANNEL) == PSPAALIB_STATUS_STOPPED;
 		}
 
 		void play() {
+			if (loadFailed) return;
+
 			if (isDone()) {
 				paused = false;
 				auto now = getNow();
 				timeStarted = now;
 				timePaused = now;
-				Mix_PlayMusic(music, 1);
+
+				AalibRewind(AT3_CHANNEL);
+				AalibPlay(AT3_CHANNEL);
 				return;
 			}
 
-			// We are not done, so resume the currently playing music.
-			// Add the length of time we were paused to the start time of the music.
-			if (paused) timeStarted += getNow() - timePaused;
-			Mix_ResumeMusic();
-			paused = false;
+			if (paused) {
+				timeStarted += getNow() - timePaused;
+				AalibPause(AT3_CHANNEL);
+				paused = false;
+			}
 		}
 
 		void pause() {
+			if (loadFailed) return;
+			if (paused) return;
+
 			paused = true;
 			timePaused = getNow();
-			Mix_PauseMusic();
+			AalibPause(AT3_CHANNEL);
 		}
 
 		float getTime() {
-			// If we are paused, always return the difference from when we paused and when we started
-			// On resume, timeStarted will update to include the time paused.
-			// Return the current time in seconds (which is what the game expects)
 			std::chrono::duration<float> duration = paused ? timePaused - timeStarted : getNow() - timeStarted;
 			return duration.count();
 		}
 
 		void update() {
-			// For the switch, we only play the music once and restart it when Mix has
-			// told us it's finished. This allows us to reset the timers in this Music
-			// instance. It might be possible to register a callback instead, but eh.
+			if (loadFailed) return;
 			if (loop && isDone()) {
-				play();
+				paused = false;
+				auto now = getNow();
+				timeStarted = now;
+				timePaused = now;
+				AalibRewind(AT3_CHANNEL);
+				AalibPlay(AT3_CHANNEL);
 			}
 		}
 
-		Mix_Music* music;
+		bool loadFailed = false;
 
-		// Timing controls
 		bool loop = false;
 		bool paused = true;
 		std::chrono::system_clock::time_point timeStarted;
@@ -89,7 +100,6 @@ namespace SuperHaxagon {
 	};
 
 	Music::Music(std::unique_ptr<Music::MusicImpl> impl) : _impl(std::move(impl)) {}
-
 	Music::~Music() = default;
 
 	void Music::update() const {
@@ -118,7 +128,7 @@ namespace SuperHaxagon {
 
 	std::unique_ptr<Music> createMusic(const std::string& path) {
 		auto data = std::make_unique<Music::MusicImpl>(path);
-		if (!data->music) return nullptr;
+		if (data->loadFailed) return nullptr;
 		return std::make_unique<Music>(std::move(data));
 	}
 }

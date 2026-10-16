@@ -113,6 +113,8 @@ namespace SuperHaxagon {
 		if (loadMetadata) {
 			_bgmMetadata = std::make_unique<Metadata>(_platform.openFile(base + ".txt", location));
 		}
+
+		_bgm = nullptr;
 		
 		_bgm = _platform.loadMusic(base, location);
 

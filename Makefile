@@ -7,41 +7,48 @@ INCDIR = \
   $(PSPDEV)/psp/include \
   $(PSPDEV)/psp/include/SDL2 \
   driver/All/include \
+  driver/PSP/glib2d \
+  driver/PSP/aalib \
   driver/PSP/source \
   source
 
 OBJS = \
-  driver/All/source/PlatformIsFullyRandom.cpp \
-  driver/All/source/PlatformSupportsFilesystem.cpp \
-  driver/PSP/source/FontSDL2.cpp \
-  driver/PSP/source/KeybindsSDL2.cpp \
-  driver/PSP/source/MusicSDL2.cpp \
-  driver/PSP/source/PlatformSDL2.cpp \
-  driver/PSP/source/ScreenSDL2.cpp \
-  driver/PSP/source/SoundSDL2.cpp \
-  driver/SDL2-PortMaster/source/PlatformPortMaster.cpp \
-  source/Core/Camera.cpp \
-  source/Core/Game.cpp \
-  source/Core/Matrix.cpp \
-  source/Core/Metadata.cpp \
-  source/Core/Structs.cpp \
-  source/Core/SurfaceGame.cpp \
-  source/Core/SurfaceUI.cpp \
-  source/Factories/LevelFactory.cpp \
-  source/Factories/PatternFactory.cpp \
-  source/Factories/WallFactory.cpp \
-  source/Objects/Level.cpp \
-  source/Objects/Pattern.cpp \
-  source/Objects/Wall.cpp \
-  source/States/Load.cpp \
-  source/States/Menu.cpp \
-  source/States/Over.cpp \
-  source/States/Play.cpp \
-  source/States/Quit.cpp \
-  source/States/Title.cpp \
-  source/States/Transition.cpp \
-  source/States/Win.cpp \
-  source/Main.cpp
+  driver/All/source/PlatformIsFullyRandom.o \
+  driver/All/source/PlatformSupportsFilesystem.o \
+  driver/PSP/aalib/pspaalib.o \
+  driver/PSP/aalib/pspaalibat3.o \
+  driver/PSP/aalib/pspaalibcommon.o \
+  driver/PSP/aalib/pspaalibeffects.o \
+  driver/PSP/aalib/pspaalibwav.o \
+  driver/PSP/source/FontSDL2.o \
+  driver/PSP/source/KeybindsSDL2.o \
+  driver/PSP/source/MusicSDL2.o \
+  driver/PSP/source/PlatformSDL2.o \
+  driver/PSP/source/ScreenSDL2.o \
+  driver/PSP/source/SoundSDL2.o \
+  driver/SDL2-PortMaster/source/PlatformPortMaster.o \
+  source/Core/Camera.o \
+  source/Core/Game.o \
+  source/Core/Matrix.o \
+  source/Core/Metadata.o \
+  source/Core/Structs.o \
+  source/Core/SurfaceGame.o \
+  source/Core/SurfaceUI.o \
+  source/Factories/LevelFactory.o \
+  source/Factories/PatternFactory.o \
+  source/Factories/WallFactory.o \
+  source/Objects/Level.o \
+  source/Objects/Pattern.o \
+  source/Objects/Wall.o \
+  source/States/Load.o \
+  source/States/Menu.o \
+  source/States/Over.o \
+  source/States/Play.o \
+  source/States/Quit.o \
+  source/States/Title.o \
+  source/States/Transition.o \
+  source/States/Win.o \
+  source/Main.o
 
 CFLAGS = -G0 -O3 -fomit-frame-pointer -fsingle-precision-constant -fno-math-errno -ffast-math -Wall -Wno-trigraphs -ffunction-sections -fdata-sections
 # CFLAGS = -g3 -Wl,-Map,EBOOT.map
@@ -52,7 +59,7 @@ BUILD_PRX = 1
 PSP_FW_VERSION = 660
 
 LIBS = -Wl,--gc-sections -Wl,--start-group -lpspgu -lpspge -lharfbuzz -lpspdisplay -lpsppower -lpspctrl -lpspaudio -lbz2 -lmodplug -lpspvram \
-  -lz -lpng -lphysfs -lvorbis -lvorbisidec -lpspatrac3 -lstdc++ -ltinyxml2 -lfreetype -lSDL2main -lSDL2 -lGL -logg -lpsphprm -lpspvfpu -lSDL2_ttf -lSDL2_mixer -lm -lc -Wl,--end-group
+  -lz -lpng -lphysfs -lpspatrac3 -lstdc++ -ltinyxml2 -lfreetype -lSDL2main -lSDL2 -lGL -lpsphprm -lpspvfpu -lSDL2_ttf -lm -lc -Wl,--end-group
 
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = Super Haxagon

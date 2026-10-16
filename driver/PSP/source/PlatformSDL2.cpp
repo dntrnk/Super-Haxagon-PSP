@@ -3,6 +3,8 @@
 
 #include "Driver/Platform.hpp"
 
+#include "pspaalib.h"
+
 #include "CreateSDL2.hpp"
 #include "Driver/Tools/Configuration.hpp"
 #include "Driver/Tools/Random.hpp"
@@ -12,7 +14,6 @@
 #include "Driver/Sound.hpp"
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
 #include <iostream>
@@ -45,7 +46,6 @@ namespace SuperHaxagon {
 		~PlatformImpl() {
 			SDL_DestroyRenderer(renderer);
 			SDL_DestroyWindow(window);
-			Mix_Quit();
 			SDL_Quit();
 		}
 
@@ -57,17 +57,11 @@ namespace SuperHaxagon {
 				return;
 			}
 
-			if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
-				platform.message(Dbg::WARN, "sdlInit", "sdl could not init audio!");
-			}
-
 			if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0) {
 				platform.message(Dbg::WARN, "sdlInit", "sdl could not init game controllers!");
 			}
 
-			Mix_Init(MIX_INIT_OGG);
-			Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096);
-			Mix_AllocateChannels(16);
+			AalibInit();
 
 			TTF_Init();
 
@@ -142,6 +136,23 @@ namespace SuperHaxagon {
 			loaded = true;
 
 			if (controller) showKbdControls = false;
+
+			platform.loadSound("awesome");
+			platform.loadSound("begin");
+			platform.loadSound("excellent");
+			platform.loadSound("go");
+			platform.loadSound("haxagon");
+			platform.loadSound("level");
+			platform.loadSound("over");
+			platform.loadSound("select");
+			platform.loadSound("wonderful");
+			platform.loadSound("heptagon");
+			platform.loadSound("hexagon");
+			platform.loadSound("line");
+			platform.loadSound("octagon");
+			platform.loadSound("pentagon");
+			platform.loadSound("square");
+			platform.loadSound("triangle");
 		}
 
 		bool loop(const Platform& platform) {
@@ -260,7 +271,7 @@ namespace SuperHaxagon {
 	}
 
 	std::unique_ptr<Music> Platform::loadMusic(const std::string& base, const Location location) const {
-		return createMusic(getPath(base, location) + ".ogg");
+		return createMusic(getPath(base, location) + ".at3");
 	}
 
 	Screen& Platform::getScreen() {

@@ -1,0 +1,88 @@
+#include "glib2d_helper.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+static bool g2d_mirror_v = false;
+
+static struct {
+    g2dImage* current_tex;
+    bool is_batching;
+} _batch = {
+    .current_tex = NULL,
+    .is_batching = false
+};
+
+static void _flush_batch(void) {
+    if (_batch.is_batching) {
+        g2dEnd();
+        _batch.current_tex = NULL;
+        _batch.is_batching = false;
+    }
+}
+
+static void _check_batch(g2dImage* tex) {
+    if (_batch.is_batching && _batch.current_tex != tex) {
+        _flush_batch();
+    }
+
+    if (!_batch.is_batching) {
+        g2dBeginRects(tex);
+        _batch.current_tex = tex;
+        _batch.is_batching = true;
+    }
+}
+
+void g2dHelperClear(g2dColor color) {
+    _flush_batch();
+    g2dClear(color);
+}
+
+void g2dHelperFlip(void) {
+    _flush_batch();
+    g2dFlip(G2D_VSYNC);
+}
+
+void g2dHelperFillRect(int x, int y, int w, int h, g2dColor color) {
+    if (g2d_mirror_v) {
+        y = 240 - y;
+        h = -h;
+    }
+    _check_batch(NULL);
+    g2dReset();
+    g2dSetColor(color);
+    g2dSetCoordXY(x, y);
+    g2dSetScaleWH(w, h);
+    g2dAdd();
+}
+
+void g2dHelperDrawRect(int x, int y, int w, int h, g2dColor color) {
+    g2dHelperFillRect(x, y, w, 1, color);
+    g2dHelperFillRect(x, y + h - 1, w, 1, color);
+    g2dHelperFillRect(x, y + 1, 1, h - 2, color);
+    g2dHelperFillRect(x + w - 1, y + 1, 1, h - 2, color);
+}
+
+void g2dHelperDrawImage(g2dImage* tex, int x, int y, int w, int h, g2dColor color, int srcx, int srcy, int srcw, int srch) {
+    if (g2d_mirror_v) {
+        y = 240 - y;
+        h = -h;
+    }
+    _check_batch(tex);
+    g2dReset();
+    g2dSetColor(color);
+    g2dSetCoordXY(x, y);
+    g2dSetCropXY(srcx, srcy);
+    g2dSetCropWH(srcw, srch);
+    g2dSetScaleWH(w, h);
+    g2dAdd();
+}
+
+void g2dHelperSetMirrorVertical(bool mirror) {
+    g2d_mirror_v = mirror;
+}
+
+#ifdef __cplusplus
+}
+#endif

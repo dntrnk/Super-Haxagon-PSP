@@ -13,3 +13,8 @@
 /output
 /release
 /repo
+*.o
+EBOOT.PBP
+*.elf
+*.prx
+*.SFO

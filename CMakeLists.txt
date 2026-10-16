@@ -52,6 +52,8 @@ if(DRIVER_EXAMPLE)
     # Any platform should be able to build this
     # if you force it to build with cmake -DDRIVER_EXAMPLE=TRUE
     include(driver/Example/example.cmake)
+elseif(CMAKE_SYSTEM_NAME MATCHES "PSP")
+    include(driver/PSP/psp.cmake)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Nintendo3DS")
     include(driver/N3DS/3ds.cmake)
 elseif(CMAKE_SYSTEM_NAME MATCHES "NintendoSwitch")

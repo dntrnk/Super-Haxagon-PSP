@@ -4,74 +4,57 @@
 
 #include "Driver/Screen.hpp"
 
-#include <SDL2/SDL.h>
+#include "glib2d_helper.h"
 
 namespace SuperHaxagon {
 	struct Screen::ScreenImpl {
-		explicit ScreenImpl(SDL_Window* platWindow, SDL_Renderer* platRenderer) {
-			window = platWindow;
-			renderer = platRenderer;
-			loaded = window && renderer;
+		explicit ScreenImpl() {
+			loaded = true;
 		}
 
 		~ScreenImpl() = default;
 
 		Vec2f getScreenDim() const {
-			if (!loaded) return {480, 272};
-
-			int w, h;
-			SDL_GetRendererOutputSize(renderer, &w, &h);
-			return {static_cast<float>(w), static_cast<float>(h)};
+			return {480, 272};
 		}
 
 		void screenFinalize() const {
-			if (!loaded) return;
-
-			SDL_RenderPresent(renderer);
+			g2dHelperFlip();
 		}
 
 		void drawPoly(const Color& color, const std::vector<Vec2f>& points) const {
-			if (!loaded) return;
+			if (points.size() < 3) return;
 
-			std::vector<SDL_Vertex> vertices;
-			std::vector<int> references;
-			vertices.reserve(points.size());
-			references.reserve((points.size()-2)*3);
+			const g2dColor c = G2D_RGBA(color.r, color.g, color.b, color.a);
 
-			// Convert to SDL2 format
-			for (const auto& point : points) {
-				vertices.emplace_back(SDL_Vertex{
-					SDL_FPoint{point.x, point.y}, SDL_Color{color.r, color.g, color.b, color.a}, SDL_FPoint{0, 0}
-				});
-			}
+			const size_t tri_count = points.size() - 2;
+			const size_t vert_count = tri_count * 3;
 
-			// Fan triangles
+			std::vector<float> xy(vert_count * 2);
+
+			const float x0 = points[0].x;
+			const float y0 = points[0].y;
+
+			size_t k = 0;
 			for (size_t i = 1; i < points.size() - 1; i++) {
-				references.emplace_back(0);
-				references.emplace_back(i);
-				references.emplace_back(i + 1);
+				xy[k++] = x0;
+				xy[k++] = y0;
+
+				xy[k++] = points[i].x;
+				xy[k++] = points[i].y;
+
+				xy[k++] = points[i + 1].x;
+				xy[k++] = points[i + 1].y;
 			}
 
-			SDL_RenderGeometry(
-				renderer,
-				nullptr,
-				vertices.data(),
-				static_cast<int>(vertices.size()),
-				references.data(),
-				static_cast<int>(references.size())
-			);
+			g2dHelperDrawTriangles(xy.data(), static_cast<int>(vert_count), c);
 		}
 
 		void clear(const Color& color) const {
-			if (!loaded) return;
-
-			SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-			SDL_RenderClear(renderer);
+			g2dHelperClear(G2D_RGB(color.r, color.g, color.b));
 		}
 
 		bool loaded = false;
-		SDL_Window* window;
-		SDL_Renderer* renderer;
 	};
 
 	Screen::Screen(std::unique_ptr<ScreenImpl> data) : _impl(std::move(data)) {}
@@ -98,7 +81,7 @@ namespace SuperHaxagon {
 		_impl->clear(color);
 	}
 
-	std::unique_ptr<Screen> createScreen(SDL_Window* window, SDL_Renderer* renderer) {
-		return std::make_unique<Screen>(std::make_unique<Screen::ScreenImpl>(window, renderer));
+	std::unique_ptr<Screen> createScreen() {
+		return std::make_unique<Screen>(std::make_unique<Screen::ScreenImpl>());
 	}
 }

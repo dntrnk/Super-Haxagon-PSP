@@ -6,106 +6,69 @@
 
 #include "Driver/Platform.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include "intraFont.h"
+#include "glib2d.h"
 
 #include <utility>
 
 namespace SuperHaxagon {
 	struct Font::FontImpl {
-		FontImpl(const Platform& platform, SDL_Renderer* renderer, SDL_Surface* surface, std::string path, int size) :
+		FontImpl(const Platform& platform, std::string path, int size) :
 			platform(platform),
 			path(std::move(path)),
-			renderer(renderer),
-			surface(surface),
-			font(nullptr),
-			currentScale(1.0f),
 			size(size),
-			requestedSize(size) {
-			// font will be created on first call to setScale(..);
+			requestedSize(1.08889) {
+			font = intraFontLoadTTF(this->path.c_str(), INTRAFONT_CACHE_ASCII, static_cast<float>(size));
+			if (!font) {
+				platform.message(Dbg::WARN, "font", "failed to load " + this->path);
+			}
 		}
 
 		~FontImpl() {
-			TTF_CloseFont(font);
+			if (font) intraFontUnload(font);
 		}
 
 		void setScale(float scale) {
-			if (currentScale == scale) return;
 			currentScale = scale;
 
-			// Scale slower than the true 3DS scale, to look nicer.
-			float realScale = (scale - 1.0f) / 1.5f + 1.0f;
-			requestedSize = static_cast<int>(realScale * static_cast<float>(size));
-
-			if (font) TTF_CloseFont(font);
-			font = TTF_OpenFont(path.c_str(), requestedSize);
-			if (!font) return;
-
-			descent = TTF_FontDescent(font);
-
-			// Note: Newer versions of SDL2_ttf include TTF_SetFontSize(TTF_Font *font, int ptsize)
-			// But to target older devices and SDL2 versions, fall back to closing and re-opening the font.
-			platform.message(Dbg::INFO, "font", "font " + std::to_string(size) + "px auto resized to " + std::to_string(requestedSize));
+			const float realScale = (scale - 1.0f) / 1.5f + 1.0f;
+			requestedSize = realScale;
 		}
 
 		float getHeight() const {
-			return static_cast<float>(requestedSize);
+			if (!font) return 0.0f;
+			return font->glyph[1].height * requestedSize;
 		}
 
 		float getWidth(const std::string& str) const {
-			if (!font) return 0;
-			int w, h;
-			TTF_SizeUTF8(font, str.c_str(), &w, &h);
-			return static_cast<float>(w);
+			if (!font || str.empty()) return 0.0f;
+			intraFontSetStyle(font, requestedSize, 0xFFFFFFFF, 0, 0, INTRAFONT_STRING_UTF8);
+			return intraFontMeasureText(font, str.c_str());
 		}
 
 		void draw(const Color& color, const Vec2f& position, const Alignment alignment, const std::string& text) const {
-			if (!font) return;
-			if (text.empty()) return;
+			if (!font || text.empty()) return;
 
-			int text_width;
-			int text_height;
-
-			SDL_Surface* fontSurface;
-			SDL_Texture* texture = nullptr;
-			SDL_Rect rect;
-			SDL_Color textColor = {color.r, color.g, color.b, 255};
-
-			fontSurface = TTF_RenderText_Solid(font, text.c_str(), textColor);
-			if (!fontSurface) return;
-
-			text_width = fontSurface->w;
-			text_height = fontSurface->h;
-
-			rect.w = text_width;
-			rect.h = text_height;
-			rect.y = static_cast<int>(position.y) + descent;
-
-			const auto width = text_width;
-			if (alignment == Alignment::LEFT) rect.x = static_cast<int>(position.x);
-			if (alignment == Alignment::CENTER) rect.x = static_cast<int>(position.x) - (width / 2);
-			if (alignment == Alignment::RIGHT) rect.x = static_cast<int>(position.x) - width;
-
-			if (renderer) {
-				texture = SDL_CreateTextureFromSurface(renderer, fontSurface);
-				SDL_RenderCopy(renderer, texture, nullptr, &rect);
-				SDL_DestroyTexture(texture);
-			} else {
-				SDL_BlitSurface(fontSurface, nullptr, surface, &rect);
+			float x = position.x;
+			if (alignment == Alignment::CENTER) {
+				const float w = getWidth(text);
+				x -= w / 2.0f;
+			} else if (alignment == Alignment::RIGHT) {
+				x -= getWidth(text);
 			}
 
-			SDL_FreeSurface(fontSurface);
+			const g2dColor c = G2D_RGBA(color.r, color.g, color.b, color.a);
+
+			intraFontSetStyle(font, requestedSize, c, 0, 0, INTRAFONT_STRING_UTF8 | INTRAFONT_ALIGN_LEFT);
+			intraFontPrint(font, x, position.y + intraFontTextHeight(font), text.c_str());
 		}
 
 		const Platform& platform;
 		std::string path;
-		SDL_Renderer* renderer;
-		SDL_Surface* surface;
-		TTF_Font* font;
-		float currentScale;
 		int size;
-		int requestedSize;
-		int descent = 0;
+		float currentScale = 1.0f;
+		float requestedSize = 1.0f;
+		intraFont* font = nullptr;
 	};
 
 	Font::Font(std::unique_ptr<Font::FontImpl> impl) : _impl(std::move(impl)) {}
@@ -128,7 +91,7 @@ namespace SuperHaxagon {
 		_impl->draw(color, position, alignment, text);
 	}
 
-	std::unique_ptr<Font> createFont(const Platform& platform, SDL_Renderer* renderer, SDL_Surface* surface, const std::string& path, int size) {
-		return std::make_unique<Font>(std::make_unique<Font::FontImpl>(platform, renderer, surface, path, size));
+	std::unique_ptr<Font> createFont(const Platform& platform, const std::string& path, int size) {
+		return std::make_unique<Font>(std::make_unique<Font::FontImpl>(platform, path, size));
 	}
 }

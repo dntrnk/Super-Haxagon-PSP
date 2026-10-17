@@ -4,6 +4,8 @@
 
 #include "Driver/Platform.hpp"
 
+#include "glib2d_helper.h"
+#include "intraFont.h"
 #include "controls.h"
 #include "pspaalib.h"
 
@@ -15,9 +17,6 @@
 #include "Driver/Screen.hpp"
 #include "Driver/Sound.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -25,116 +24,28 @@
 
 namespace SuperHaxagon {
 	std::unique_ptr<Music> createMusic(const std::string& path);
-	std::unique_ptr<Screen> createScreen(SDL_Window* window, SDL_Renderer* renderer);
+	std::unique_ptr<Screen> createScreen();
 	std::unique_ptr<Sound> createSound(const std::string& path);
-	std::unique_ptr<Font> createFont(const Platform& platform, SDL_Renderer* renderer, SDL_Surface* surface, const std::string& path, int size);
-
-	SDL_GameController* findController(const Platform& platform) {
-		for (int i = 0; i < SDL_NumJoysticks(); i++) {
-			if (SDL_IsGameController(i)) {
-				platform.message(Dbg::INFO, "findController", "found controller: " + std::to_string(i));
-				return SDL_GameControllerOpen(i);
-			} else {
-				platform.message(Dbg::INFO, "findController", "controller " + std::to_string(i) + " incompatible");
-			}
-		}
-
-		return nullptr;
-	}
+	std::unique_ptr<Font> createFont(const Platform& platform, const std::string& path, int size);
 
 	struct Platform::PlatformImpl {
-		PlatformImpl() : screen(createScreen(nullptr, nullptr)) {}
+		PlatformImpl() : screen(createScreen()) {}
 
 		~PlatformImpl() {
-			SDL_DestroyRenderer(renderer);
-			SDL_DestroyWindow(window);
-			SDL_Quit();
+			sceKernelExitGame();
 		}
 
-		void sdlInit(const Platform& platform) {
-			initializePlatform(sdmc, romfs, backslash, controllerSettings);
+		void gameInit(const Platform& platform) {
+			initializePlatform(sdmc, romfs, backslash);
 
-			if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
-				platform.message(Dbg::FATAL, "sdlInit", "sdl could not init video!");
-				return;
-			}
-
+			g2dInit();
+			intraFontInit();
 			controls_init();
 			AalibInit();
 
-			TTF_Init();
-
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
-
-			window = getWindow(platform);
-			if (!window) {
-				platform.message(Dbg::FATAL, "sdlInit", "could not init sfml window!");
-				return;
-			}
-
-			renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-			if (!renderer) {
-				// fallback to software
-				platform.message(Dbg::WARN, "sdlInit", "falling back to software rendering");
-				renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
-				software = true;
-				if (!renderer) {
-					platform.message(Dbg::FATAL, "sdlInit", "... and it failed!");
-					return;
-				}
-			}
-
-			SDL_ShowCursor(SDL_DISABLE);
-			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-			SDL_RenderClear(renderer);
-			SDL_RenderPresent(renderer);
-
-			SDL_StopTextInput();
-
-			// Add version information to title
-			SDL_SetWindowTitle(window, (std::string(APP_NAME " (") + VERSION + ")").c_str());
-
 			time = std::chrono::high_resolution_clock::now();
-			screen = createScreen(window, renderer);
-			controller = findController(platform);
-
-			// This environment variable gets set in the SuperHaxagon.sh script (or manually by the user)
-			if (const auto* env = std::getenv("CONTROLLER")) {
-				const std::string layout = env;
-
-				// Fix for knulli using weird keys.
-				if (layout == "knulli") controllerSettings = ControllerSettings::SWAPPED_FACE_BUTTONS;
-
-				// Fix for if you want the face buttons of an xbox controller to map to the prompts.
-				// Any CFW using XBox style controls should be listed below
-				if (layout == "xbox") controllerSettings = ControllerSettings::XBOX;
-
-				// Fix for if you want the face buttons of an xbox controller to map to the prompts,
-				// but you also want "B" (east) to be your select button.
-				// This is a user preference.
-				if (layout == "xbox_b") controllerSettings = ControllerSettings::XBOX_B_SELECT;
-			}
-
-			switch (controllerSettings) {
-				default:
-				case ControllerSettings::NINTENDO:
-					platform.message(Dbg::INFO, "sdlInit",  "nintendo controller layout"); break;
-				case ControllerSettings::XBOX:
-					platform.message(Dbg::INFO, "sdlInit",  "xbox controller layout"); break;
-				case ControllerSettings::XBOX_B_SELECT:
-					platform.message(Dbg::INFO, "sdlInit",  "xbox controller layout with b as select"); break;
-				case ControllerSettings::SWAPPED_FACE_BUTTONS:
-					platform.message(Dbg::INFO, "sdlInit",  "controller knulli mode"); break;
-			}
-
-			const auto* driver = SDL_GetCurrentVideoDriver();
-			if (driver) platform.message(Dbg::INFO, "sdlInit", "using driver " + std::string(driver));
 
 			loaded = true;
-
-			if (controller) showKbdControls = false;
 
 			platform.loadSound("awesome");
 			platform.loadSound("begin");
@@ -205,36 +116,24 @@ namespace SuperHaxagon {
 
 		float frameTime = 0.0f;
 		bool loaded = false;
-		bool showKbdControls = true;
 		bool software = false;
 		bool backslash = false;
-		ControllerSettings controllerSettings = ControllerSettings::NINTENDO;
-		SDL_Window* window = nullptr;
-		SDL_Renderer* renderer = nullptr;
-		SDL_GameController* controller = nullptr;
 		std::string sdmc;
 		std::string romfs;
 	};
 
 	Platform::Platform() : _impl(std::make_unique<PlatformImpl>()) {
-		_impl->sdlInit(*this);
+		_impl->gameInit(*this);
 	}
 
 	Platform::~Platform() = default;
 
-	void initializePlatform(std::string& sdmc, std::string& romfs, bool& backslash, ControllerSettings& controllerSettings) {
-		(void) controllerSettings;
-
+	void initializePlatform(std::string& sdmc, std::string& romfs, bool& backslash) {
 		sdmc = "./sdmc";
 		romfs = "./romfs";
 		backslash = false;
 
 		mkdir(sdmc.c_str(), 0755);
-	}
-
-
-	SDL_Window* getWindow(const Platform&) {
-		return SDL_CreateWindow(APP_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI);
 	}
 
 	bool Platform::loop() {
@@ -251,7 +150,7 @@ namespace SuperHaxagon {
 
 	std::unique_ptr<Font> Platform::loadFont(const int size) const {
 		if (!_impl->loaded) return nullptr;
-		return createFont(*this, _impl->renderer, nullptr, getPath("/bump-it-up.ttf", Location::ROM), size);
+		return createFont(*this, getPath("/bump-it-up.ttf", Location::ROM), size);
 	}
 
 	std::unique_ptr<Sound> Platform::loadSound(const std::string& base) const {
@@ -267,7 +166,7 @@ namespace SuperHaxagon {
 	}
 
 	std::string Platform::getButtonName(ButtonName buttonName) {
-		return ::SuperHaxagon::getButtonName(buttonName, _impl->showKbdControls, _impl->controllerSettings);
+		return ::SuperHaxagon::getButtonName(buttonName);
 	}
 
 	Buttons Platform::getPressed() const {

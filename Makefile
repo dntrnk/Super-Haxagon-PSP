@@ -8,14 +8,20 @@ INCDIR = \
   $(PSPDEV)/psp/include/SDL2 \
   driver/All/include \
   driver/PSP/glib2d \
+  driver/PSP/intraFont \
   driver/PSP/controls \
   driver/PSP/aalib \
   driver/PSP/source \
-  source
+  source \
+  include/freetype2
 
 OBJS = \
   driver/All/source/PlatformIsFullyRandom.o \
   driver/All/source/PlatformSupportsFilesystem.o \
+  driver/PSP/glib2d/glib2d.o \
+  driver/PSP/glib2d/glib2d_helper.o \
+  driver/PSP/intraFont/intraFont.o \
+  driver/PSP/intraFont/libccc.o \
   driver/PSP/controls/controls.o \
   driver/PSP/aalib/pspaalib.o \
   driver/PSP/aalib/pspaalibat3.o \
@@ -59,8 +65,7 @@ ASFLAGS = $(CFLAGS) -c
 BUILD_PRX = 1
 PSP_FW_VERSION = 660
 
-LIBS = -Wl,--gc-sections -Wl,--start-group -lpspgu -lpspge -lharfbuzz -lpspdisplay -lpsppower -lpspctrl -lpspaudio -lbz2 -lmodplug -lpspvram \
-  -lz -lpng -lphysfs -lpspatrac3 -lstdc++ -ltinyxml2 -lfreetype -lSDL2main -lSDL2 -lGL -lpsphprm -lpspvfpu -lSDL2_ttf -lm -lc -Wl,--end-group
+LIBS = -Wl,--gc-sections -lpspgu -lpspge -lpspdisplay -lpspvram -lpsppower -lpspctrl -lpspaudio -lpspatrac3 -lstdc++ -lbz2 -lz -lpng -lfreetype
 
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = Super Haxagon

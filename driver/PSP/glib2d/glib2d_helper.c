@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-static bool g2d_mirror_v = false;
+#include <pspgu.h>
 
 static struct {
     g2dImage* current_tex;
@@ -44,11 +44,15 @@ void g2dHelperFlip(void) {
     g2dFlip(G2D_VSYNC);
 }
 
-void g2dHelperFillRect(int x, int y, int w, int h, g2dColor color) {
-    if (g2d_mirror_v) {
-        y = 240 - y;
-        h = -h;
+void g2dHelperFlushBatch(void) {
+    if (_batch.is_batching) {
+        g2dEnd();
+        _batch.current_tex = NULL;
+        _batch.is_batching = false;
     }
+}
+
+void g2dHelperFillRect(int x, int y, int w, int h, g2dColor color) {
     _check_batch(NULL);
     g2dReset();
     g2dSetColor(color);
@@ -65,10 +69,6 @@ void g2dHelperDrawRect(int x, int y, int w, int h, g2dColor color) {
 }
 
 void g2dHelperDrawImage(g2dImage* tex, int x, int y, int w, int h, g2dColor color, int srcx, int srcy, int srcw, int srch) {
-    if (g2d_mirror_v) {
-        y = 240 - y;
-        h = -h;
-    }
     _check_batch(tex);
     g2dReset();
     g2dSetColor(color);
@@ -79,8 +79,32 @@ void g2dHelperDrawImage(g2dImage* tex, int x, int y, int w, int h, g2dColor colo
     g2dAdd();
 }
 
-void g2dHelperSetMirrorVertical(bool mirror) {
-    g2d_mirror_v = mirror;
+void g2dHelperDrawTriangles(const float* xy, int count, g2dColor color) {
+    if (!xy || count < 3 || (count % 3) != 0) return;
+
+    _flush_batch();
+
+    struct Vertex {
+        g2dColor color;
+        short x, y;
+        short z;
+    };
+
+    struct Vertex* v = (struct Vertex*) sceGuGetMemory(count * sizeof(struct Vertex));
+    if (!v) return;
+
+    for (int i = 0; i < count; i++) {
+        v[i].color = color;
+        v[i].x = (short) (xy[2 * i]);
+        v[i].y = (short) (xy[2 * i + 1]);
+        v[i].z = 0.0f;
+    }
+
+    sceGuDisable(GU_TEXTURE_2D);
+    sceGuEnable(GU_BLEND);
+    sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
+
+    sceGuDrawArray(GU_TRIANGLES, GU_COLOR_8888 | GU_VERTEX_16BIT | GU_TRANSFORM_2D, count, NULL, v);
 }
 
 #ifdef __cplusplus

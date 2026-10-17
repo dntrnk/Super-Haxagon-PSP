@@ -178,7 +178,7 @@ namespace SuperHaxagon {
 			const auto platform = PLATFORM_NAME;
 			const auto port = "ported by dntrnk";
 			const Vec2f posPlatform = {screen.x/2.0f, pad};
-			const Vec2f posPort = {screen.x/2.0f, pad + small.getHeight()};
+			const Vec2f posPort = {screen.x/2.0f, pad + small.getHeight() + 2.0f};
 			small.draw(COLOR_WHITE, posPlatform, Alignment::CENTER, platform);
 			small.draw(COLOR_WHITE, posPort, Alignment::CENTER, port);
 		}

@@ -8,7 +8,10 @@ Changes:
 - PSP XMB icons for EBOOT.PBP
 - Removed unused code
 - Replaced OGG music with AT3 music
-- Re-converted WAV files for PSP
+- Re-converted WAV files for PSP (from 48000Hz to 44100Hz)
 - pspaalib for AT3 music and WAV sound effects instead of SDL2_mixer
 - Native PSP controls (sceCtrl) instead of SDL2 game controller
 - Added "ported by dntrnk" line to the title screen (Title.cpp)
+- Replaced SDL2 rendering with glib2d
+- Replaced SDL2_ttf with intraFont
+- Added PSP module definition and PSP callbacks to Main.cpp

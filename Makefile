@@ -8,6 +8,7 @@ INCDIR = \
   $(PSPDEV)/psp/include/SDL2 \
   driver/All/include \
   driver/PSP/glib2d \
+  driver/PSP/controls \
   driver/PSP/aalib \
   driver/PSP/source \
   source
@@ -15,6 +16,7 @@ INCDIR = \
 OBJS = \
   driver/All/source/PlatformIsFullyRandom.o \
   driver/All/source/PlatformSupportsFilesystem.o \
+  driver/PSP/controls/controls.o \
   driver/PSP/aalib/pspaalib.o \
   driver/PSP/aalib/pspaalibat3.o \
   driver/PSP/aalib/pspaalibcommon.o \

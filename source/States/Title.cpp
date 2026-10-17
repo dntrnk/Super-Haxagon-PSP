@@ -120,7 +120,6 @@ namespace SuperHaxagon {
 					{"BACK:", _game.getPlatform().getButtonName(ButtonName::BACK)},
 					{"LEFT:", _game.getPlatform().getButtonName(ButtonName::LEFT)},
 					{"RIGHT:", _game.getPlatform().getButtonName(ButtonName::RIGHT)},
-					{"QUIT:", _game.getPlatform().getButtonName(ButtonName::QUIT)},
 			};
 
 			float maxWidthNames = 0.0f;

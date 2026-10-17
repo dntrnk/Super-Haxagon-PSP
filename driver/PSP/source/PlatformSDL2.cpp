@@ -3,6 +3,7 @@
 
 #include "Driver/Platform.hpp"
 
+#include "controls.h"
 #include "pspaalib.h"
 
 #include "CreateSDL2.hpp"
@@ -57,10 +58,7 @@ namespace SuperHaxagon {
 				return;
 			}
 
-			if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0) {
-				platform.message(Dbg::WARN, "sdlInit", "sdl could not init game controllers!");
-			}
-
+			controls_init();
 			AalibInit();
 
 			TTF_Init();
@@ -173,40 +171,14 @@ namespace SuperHaxagon {
 			frameTime = static_cast<float>(us) /  1000000.0f;
 			time = now;
 
-			SDL_Event ev;
-			while (SDL_PollEvent(&ev)) {
-				switch(ev.type) {
-					case SDL_QUIT:
-						return false;
-					case SDL_KEYDOWN:
-					case SDL_KEYUP:
-						setKey(buttons, ev.key.keysym.sym, ev.key.state == SDL_PRESSED);
-						showKbdControls = true;
-						break;
-					case SDL_CONTROLLERDEVICEADDED:
-						if (!controller) {
-							platform.message(Dbg::INFO, "loop", "controller connected");
-							controller = SDL_GameControllerOpen(ev.cdevice.which);
-							showKbdControls = false;
-						}
-						break;
-					case SDL_CONTROLLERDEVICEREMOVED:
-						if (controller && ev.cdevice.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller))) {
-							platform.message(Dbg::INFO, "loop", "controller disconnected");
-							SDL_GameControllerClose(controller);
-							controller = findController(platform);
-							showKbdControls = true;
-						}
-						break;
-					case SDL_CONTROLLERBUTTONDOWN:
-					case SDL_CONTROLLERBUTTONUP:
-						if (controller && ev.cdevice.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller))) {
-							setController(buttons, ev.cbutton.button, ev.cbutton.state == SDL_PRESSED, controllerSettings);
-							showKbdControls = false;
-						}
-						break;
-				}
-			}
+			controls_read();
+
+			buttons.select = controls_held(PSP_CTRL_CROSS);
+			buttons.back = controls_held(PSP_CTRL_CIRCLE);
+			buttons.left = controls_held(PSP_CTRL_LEFT) | controls_held(PSP_CTRL_LTRIGGER) | (controls_AnalogX() < -75);
+			buttons.right = controls_held(PSP_CTRL_RIGHT) | controls_held(PSP_CTRL_RTRIGGER) | (controls_AnalogX() > 75);
+			buttons.select = controls_held(PSP_CTRL_CROSS);
+			buttons.quit = false;
 
 			return true;
 		}

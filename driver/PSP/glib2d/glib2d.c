@@ -140,9 +140,6 @@ static g2dCoord_Mode obj_coord_mode;
 static int obj_colors_count;
 static g2dImage *obj_tex;
 
-float g2dScreenOffsetX = 80.0f;
-float g2dScreenOffsetY = 16.0f;
-
 g2dImage g2d_draw_buffer = { 512, 512, G2D_SCR_W, G2D_SCR_H,
                              (float)G2D_SCR_W / G2D_SCR_H, false, false,
                              GU_PSM_8888, false, 1, 1,
@@ -779,9 +776,6 @@ void g2dAdd() {
     }
 
     obj_list_size++;
-
-    obj.x += g2dScreenOffsetX;
-    obj.y += g2dScreenOffsetY;
 
     obj.rot_x = obj.x;
     obj.rot_y = obj.y;

@@ -61,8 +61,6 @@ extern "C" {
 #include <stdint.h>
 #include <psptypes.h>
 
-extern float g2dScreenOffsetX, g2dScreenOffsetY;
-
     /**
      * \def USE_PNG
      * \brief Choose if the PNG support is enabled.

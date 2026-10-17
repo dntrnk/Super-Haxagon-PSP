@@ -1,3 +1,9 @@
+# SuperHaxagon PSP Credits
+
+## PSP Port
+
+### dntrnk ([dntrnk.ru](https://dntrnk.ru))
+
 # SuperHaxagon Credits
 
 SuperHaxagon's assets are provided by these amazing people:

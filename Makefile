@@ -58,7 +58,6 @@ OBJS = \
   source/Main.o
 
 CFLAGS = -G0 -O3 -fomit-frame-pointer -fsingle-precision-constant -fno-math-errno -ffast-math -Wall -Wno-trigraphs -ffunction-sections -fdata-sections
-# CFLAGS = -g3 -Wl,-Map,EBOOT.map
 CXXFLAGS = $(CFLAGS) -fno-rtti -fno-exceptions -fvisibility=hidden -fvisibility-inlines-hidden
 ASFLAGS = $(CFLAGS) -c
 
@@ -70,8 +69,8 @@ LIBS = -Wl,--gc-sections -lpspgu -lpspge -lpspdisplay -lpspvram -lpsppower -lpsp
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = Super Haxagon
 PSP_EBOOT_ICON = media/ICON0.PNG
-# PSP_EBOOT_PIC0 = res/PIC0.PNG
-# PSP_EBOOT_PIC1 = res/PIC1.PNG
+PSP_EBOOT_PIC0 = media/PIC0.PNG
+PSP_EBOOT_PIC1 = media/PIC1.PNG
 
 SFOFLAGS = -d MEMSIZE=1
 

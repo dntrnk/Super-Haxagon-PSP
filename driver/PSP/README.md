@@ -1,8 +1,3 @@
-# SDL2 Driver
-
-This driver contains most of the common code for implementing a SDL2 based platform. It doesn't
-compile itself, but other drivers use the common sdl2.cmake and source files here.
-
 ## License
 
 This driver is available under two licenses: GPLv3 (or later) OR MIT.

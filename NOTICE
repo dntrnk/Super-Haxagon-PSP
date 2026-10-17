@@ -6,7 +6,7 @@ Changes:
 - Makefile build for pspdev toolchain
 - PSP-specific Configuration.hpp
 - PSP XMB icons for EBOOT.PBP
-- Removed unused code
+- Removed unused code and drivers for other platforms
 - Replaced OGG music with AT3 music
 - Re-converted WAV files for PSP (from 48000Hz to 44100Hz)
 - pspaalib for AT3 music and WAV sound effects instead of SDL2_mixer
@@ -15,3 +15,4 @@ Changes:
 - Replaced SDL2 rendering with glib2d
 - Replaced SDL2_ttf with intraFont
 - Added PSP module definition and PSP callbacks to Main.cpp
+- Updated documentation for the PSP port (README, CREDITS, LICENSE.libs)

@@ -2,25 +2,27 @@
 
 This driver uses the following libraries, which are licensed with the following terms:
 
-## SDL2 Driver
+### pspaalib
 
-* Directory: files in `driver/SDL2-Linux`, `driver/SDL2-Miyoo`, `driver/SDL2-PortMaster`, and `driver/SDL2`
-* License: GPLv3-or-later (or MIT)
-* Copyright © 2025 AJ Walter
+* License: Unknown / Not specified
+* Author: Arshia001
 
-## SDL2
+### glib2d
 
-* Website: https://wiki.libsdl.org/SDL2/FrontPage
-* Source: https://github.com/libsdl-org/SDL/tree/SDL2
-* License: zlib
-* Copyright © 1997-2025 Sam Lantinga
+* Source: https://github.com/GeeckoDev/glib2d
+* License: Creative Commons BY-SA 3.0 Unported
 
-## SDL2_ttf
+### intraFont
 
-* Website: https://wiki.libsdl.org/SDL2_ttf/FrontPage
-* Source: https://github.com/libsdl-org/SDL_ttf/tree/SDL2
-* License: zlib
-* Copyright © 1997-2025 Sam Lantinga
+* Source: https://github.com/pspdev/libintraFont
+* License: Creative Commons Attribution-Share Alike 3.0
+* Author: BenHur
+
+### libccc
+
+* Source: https://github.com/pspdev/libintraFont
+* License: Creative Commons Attribution-Share Alike 3.0 
+* Author: BenHur
 
 ### FreeType
 
@@ -29,78 +31,21 @@ This driver uses the following libraries, which are licensed with the following 
 * License: freetype
 * Copyright © 1996-2002, 2006 by David Turner, Robert Wilhelm, and Werner Lemberg
 
-### HarfBuzz
-
-* Website: https://harfbuzz.github.io/
-* Source: https://github.com/harfbuzz/harfbuzz
-* License: "Old MIT"
-* Copyright © 1998-2023 HarfBuzz Contributors
-
-## SDL2_mixer
-
-* Website: https://wiki.libsdl.org/SDL2_mixer/FrontPage
-* Source: https://github.com/libsdl-org/SDL_mixer/tree/SDL2
-* License: zlib
-* Copyright © 1997-2025 Sam Lantinga
-
-### flac, ogg, opusfile, vorbis
-
-* Website:https://www.xiph.org/
-* Sources:  
-  https://github.com/xiph/flac  
-  https://github.com/xiph/ogg  
-  https://github.com/xiph/opusfile  
-  https://github.com/xiph/vorbis  
-* License: BSD-3-Clause
-* Copyright © Xiph.org Foundation
-
 # **License Texts**
 
 ## GPLv3
 
 The license text is provided in LICENSE.md at the root of this repository.
 
-## MIT
+## Creative Commons BY-SA 3.0
 
-```
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+To view a copy of this license, visit:
+https://creativecommons.org/licenses/by-sa/3.0/
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-## zlib
-
-```
-This software is provided 'as-is', without any express or implied
-warranty.  In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.
-```
+The full legal code is available at:
+https://creativecommons.org/licenses/by-sa/3.0/legalcode
 
 ## FreeType
 
@@ -271,49 +216,6 @@ There are two mailing lists related to FreeType:
 Our home page can be found at
 
     https://www.freetype.org
-```
-
-## HarfBuzz "Old MIT"
-
-```
-Copyright © 2010-2022  Google, Inc.
-Copyright © 2015-2020  Ebrahim Byagowi
-Copyright © 2019,2020  Facebook, Inc.
-Copyright © 2012,2015  Mozilla Foundation
-Copyright © 2011  Codethink Limited
-Copyright © 2008,2010  Nokia Corporation and/or its subsidiary(-ies)
-Copyright © 2009  Keith Stribley
-Copyright © 2011  Martin Hosken and SIL International
-Copyright © 2007  Chris Wilson
-Copyright © 2005,2006,2020,2021,2022,2023  Behdad Esfahbod
-Copyright © 2004,2007,2008,2009,2010,2013,2021,2022,2023  Red Hat, Inc.
-Copyright © 1998-2005  David Turner and Werner Lemberg
-Copyright © 2016  Igalia S.L.
-Copyright © 2022  Matthias Clasen
-Copyright © 2018,2021  Khaled Hosny
-Copyright © 2018,2019,2020  Adobe, Inc
-Copyright © 2013-2015  Alexei Podtelezhnikov
-
-For full copyright notices consult the individual files in the package.
-
-
-Permission is hereby granted, without written agreement and without
-license or royalty fees, to use, copy, modify, and distribute this
-software and its documentation for any purpose, provided that the
-above copyright notice and the following two paragraphs appear in
-all copies of this software.
-
-IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE TO ANY PARTY FOR
-DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
-ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN
-IF THE COPYRIGHT HOLDER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGE.
-
-THE COPYRIGHT HOLDER SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
-ON AN "AS IS" BASIS, AND THE COPYRIGHT HOLDER HAS NO OBLIGATION TO
-PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 ```
 
 ## BSD-3-Clause

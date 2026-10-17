@@ -22,13 +22,12 @@ OBJS = \
   driver/PSP/aalib/pspaalibcommon.o \
   driver/PSP/aalib/pspaalibeffects.o \
   driver/PSP/aalib/pspaalibwav.o \
-  driver/PSP/source/FontSDL2.o \
-  driver/PSP/source/KeybindsSDL2.o \
-  driver/PSP/source/MusicSDL2.o \
-  driver/PSP/source/PlatformSDL2.o \
-  driver/PSP/source/ScreenSDL2.o \
-  driver/PSP/source/SoundSDL2.o \
-  driver/SDL2-PortMaster/source/PlatformPortMaster.o \
+  driver/PSP/source/FontPSP.o \
+  driver/PSP/source/KeybindsPSP.o \
+  driver/PSP/source/MusicPSP.o \
+  driver/PSP/source/PlatformPSP.o \
+  driver/PSP/source/ScreenPSP.o \
+  driver/PSP/source/SoundPSP.o \
   source/Core/Camera.o \
   source/Core/Game.o \
   source/Core/Matrix.o \

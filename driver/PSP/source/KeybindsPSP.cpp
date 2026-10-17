@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 dntrnk
 // SPDX-License-Identifier: GPL-3.0-or-later OR MIT
 
-#include "CreateSDL2.hpp"
+#include "CreatePSP.hpp"
 
 #include "controls.h"
 

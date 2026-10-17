@@ -7,7 +7,7 @@
 #include "controls.h"
 #include "pspaalib.h"
 
-#include "CreateSDL2.hpp"
+#include "CreatePSP.hpp"
 #include "Driver/Tools/Configuration.hpp"
 #include "Driver/Tools/Random.hpp"
 #include "Driver/Font.hpp"
@@ -222,6 +222,21 @@ namespace SuperHaxagon {
 
 	Platform::~Platform() = default;
 
+	void initializePlatform(std::string& sdmc, std::string& romfs, bool& backslash, ControllerSettings& controllerSettings) {
+		(void) controllerSettings;
+
+		sdmc = "./sdmc";
+		romfs = "./romfs";
+		backslash = false;
+
+		mkdir(sdmc.c_str(), 0755);
+	}
+
+
+	SDL_Window* getWindow(const Platform&) {
+		return SDL_CreateWindow(APP_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI);
+	}
+
 	bool Platform::loop() {
 		return _impl->loop(*this);
 	}
@@ -257,6 +272,20 @@ namespace SuperHaxagon {
 
 	Buttons Platform::getPressed() const {
 		return _impl->buttons;
+	}
+
+	void Platform::message(const Dbg dbg, const std::string& where, const std::string& message) const {
+		if (dbg == Dbg::INFO) {
+			std::cout << "[psp:info] " + where + ": " + message << std::endl;
+		} else if (dbg == Dbg::WARN) {
+			std::cout << "[psp:warn] " + where + ": " + message << std::endl;
+		} else if (dbg == Dbg::FATAL) {
+			std::cerr << "[psp:fatal] " + where + ": " + message << std::endl;
+		}
+	}
+
+	Supports Platform::supports() {
+		return Supports::SHADOWS;
 	}
 
 	void Platform::shutdown() {}

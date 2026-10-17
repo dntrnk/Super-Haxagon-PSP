@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2025 AJ Walter
+// SPDX-FileCopyrightText: 2026 dntrnk
 // SPDX-License-Identifier: GPL-3.0
 
 #include "States/Title.hpp"
@@ -174,12 +175,13 @@ namespace SuperHaxagon {
 			small.draw(COLOR_WHITE, posVersion, Alignment::RIGHT, version);
 
 			if constexpr (sizeof(PLATFORM_NAME) > 1) {
-				const auto platform = PLATFORM_NAME;
-				const Vec2f posPlatform = {screen.x/2.0f, pad};
-				//const Vec2f platformSize = {small.getWidth(platform) + pad * 2, small.getHeight() + pad * 2};
-				//surface.drawPolyUITopLeft(COLOR_TRANSPARENT, platformSize);
-				small.draw(COLOR_WHITE, posPlatform, Alignment::CENTER, platform);
-			}
+			const auto platform = PLATFORM_NAME;
+			const auto port = "ported by dntrnk";
+			const Vec2f posPlatform = {screen.x/2.0f, pad};
+			const Vec2f posPort = {screen.x/2.0f, pad + small.getHeight()};
+			small.draw(COLOR_WHITE, posPlatform, Alignment::CENTER, platform);
+			small.draw(COLOR_WHITE, posPort, Alignment::CENTER, port);
+		}
 		}
 	}
 

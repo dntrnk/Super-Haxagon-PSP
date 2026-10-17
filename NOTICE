@@ -1,0 +1,14 @@
+Super-Haxagon-PSP
+Based on Super-Haxagon by AJ Walter (https://github.com/RedTopper/Super-Haxagon), licensed under GPL-3.0-or-later OR MIT.
+Modified by dntrnk in 2026.
+
+Changes:
+- Makefile build for pspdev toolchain
+- PSP-specific Configuration.hpp
+- PSP XMB icons for EBOOT.PBP
+- Removed unused code
+- Replaced OGG music with AT3 music
+- Re-converted WAV files for PSP
+- pspaalib for AT3 music and WAV sound effects instead of SDL2_mixer
+- Native PSP controls (sceCtrl) instead of SDL2 game controller
+- Added "ported by dntrnk" line to the title screen (Title.cpp)

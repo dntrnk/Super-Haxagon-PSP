@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2025 AJ Walter
+// SPDX-FileCopyrightText: 2026 dntrnk
 // SPDX-License-Identifier: GPL-3.0-or-later OR MIT
 
 #include "Driver/Platform.hpp"
